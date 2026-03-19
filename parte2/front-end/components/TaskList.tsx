@@ -83,19 +83,16 @@ export function TaskList({ tasks, loading, onDelete, onChangeStatus }: Props) {
 
               <div className="task-card-footer">
                 <span className="task-card-meta">{formatDate(task.created_at)}</span>
-                <div className="status-picker" role="group" aria-label="Alterar status">
+                <select
+                  className="status-select"
+                  value={task.status}
+                  onChange={(e) => onChangeStatus(task, e.target.value as TaskStatus)}
+                  aria-label="Alterar status"
+                >
                   {STATUS_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      className={`status-pill ${opt.value} ${task.status === opt.value ? 'active' : ''}`}
-                      onClick={() => task.status !== opt.value && onChangeStatus(task, opt.value)}
-                      disabled={task.status === opt.value}
-                      title={`Mudar para ${opt.label}`}
-                    >
-                      {opt.label}
-                    </button>
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
-                </div>
+                </select>
               </div>
             </div>
           </div>
