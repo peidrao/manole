@@ -25,37 +25,16 @@ export function AuthForm({ onLogin, onRegister, loading, error }: Props) {
 
   return (
     <div className="auth-page">
-      <div className="auth-brand">
-        <div className="auth-brand-logo">M</div>
-        <h1>Gerencie suas tarefas com eficiência</h1>
-        <p>Organize, priorize e acompanhe o progresso de todas as suas atividades em um só lugar.</p>
-        <div className="auth-features">
-          <div className="auth-feature">
-            <span className="auth-feature-dot" />
-            Crie e organize tarefas por status
-          </div>
-          <div className="auth-feature">
-            <span className="auth-feature-dot" />
-            Acompanhe o andamento em tempo real
-          </div>
-          <div className="auth-feature">
-            <span className="auth-feature-dot" />
-            Acesso seguro com autenticação JWT
-          </div>
+      <div className="auth-card">
+        <div className="auth-header">
+          <div className="auth-header-logo">M</div>
+          <h2>{tab === 'login' ? 'Bem-vindo de volta' : 'Criar conta'}</h2>
+          <p>
+            {tab === 'login'
+              ? 'Entre com suas credenciais para continuar.'
+              : 'Preencha os dados para criar sua conta.'}
+          </p>
         </div>
-      </div>
-
-      <div className="auth-panel">
-        <div className="auth-card">
-          <div className="auth-header">
-            <div className="auth-header-logo">M</div>
-            <h2>{tab === 'login' ? 'Bem-vindo de volta' : 'Criar conta'}</h2>
-            <p>
-              {tab === 'login'
-                ? 'Entre com suas credenciais para continuar.'
-                : 'Preencha os dados para criar sua conta.'}
-            </p>
-          </div>
 
           <div className="auth-tabs">
             <button
@@ -136,7 +115,6 @@ export function AuthForm({ onLogin, onRegister, loading, error }: Props) {
               </>
             )}
           </p>
-        </div>
       </div>
     </div>
   );
