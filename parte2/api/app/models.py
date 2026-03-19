@@ -1,13 +1,14 @@
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 
-from sqlalchemy import DateTime, Enum as SqlEnum, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
 
 
-class TaskStatus(str, Enum):
+class TaskStatus(StrEnum):
     PENDING = "pendente"
     IN_PROGRESS = "em_andamento"
     COMPLETED = "concluida"
@@ -35,6 +36,6 @@ class Task(Base):
         nullable=False,
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+        DateTime, default=lambda: datetime.now(UTC), nullable=False
     )
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)

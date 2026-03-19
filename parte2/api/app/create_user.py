@@ -2,11 +2,11 @@ import argparse
 import getpass
 import sys
 
-from pydantic import EmailStr, ValidationError, TypeAdapter
+from pydantic import EmailStr, TypeAdapter, ValidationError
 
-from .utils.auth import hash_password
 from .database import SessionLocal
 from .models import User
+from .utils.auth import hash_password
 
 
 def parse_args() -> argparse.Namespace:
