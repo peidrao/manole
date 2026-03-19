@@ -14,7 +14,7 @@ describe('TaskForm', () => {
     await userEvent.type(screen.getByLabelText('Descrição'), 'Criar endpoint de tarefas');
     await userEvent.selectOptions(screen.getByLabelText('Status'), 'em_andamento');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Adicionar' }));
+    await userEvent.click(screen.getByRole('button', { name: /adicionar tarefa/i }));
 
     expect(onSubmit).toHaveBeenCalledWith(
       'Estudar FastAPI',
