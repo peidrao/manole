@@ -5,7 +5,7 @@ import sys
 from pydantic import EmailStr, ValidationError, TypeAdapter
 
 from .utils.auth import hash_password
-from .database import Base, SessionLocal, engine
+from .database import SessionLocal
 from .models import User
 
 
@@ -46,9 +46,6 @@ def main() -> int:
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
-
-    # Keeps the command robust even when migrations were not applied on an existing volume.
-    Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
     try:
