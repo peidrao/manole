@@ -13,10 +13,7 @@ async function request<T>(
   options: RequestInit = {},
   token?: string,
 ): Promise<T> {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...(options.headers ?? {}),
-  };
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 
   if (token) {
     headers.Authorization = `Bearer ${token}`;
