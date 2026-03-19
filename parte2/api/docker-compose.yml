@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tasks_db
+    environment:
+      POSTGRES_DB: tasks_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: tasks_api
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/tasks_db
+      JWT_SECRET: super-secret-change-me
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+    ports:
+      - '8000:8000'
+
+volumes:
+  postgres_data:
