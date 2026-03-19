@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+
+set -eu
+
+COMMIT_MSG_FILE="$1"
+FIRST_LINE="$(sed -n '1p' "$COMMIT_MSG_FILE" | tr -d '\r')"
+
+# Allows auto-generated commits from Git itself.
+case "$FIRST_LINE" in
+  Merge\ *|Revert\ *|fixup\!*|squash\!*)
+    exit 0
+    ;;
+esac
+
+python3 - "$FIRST_LINE" << 'PY'
+import re
+import sys
+
+line = sys.argv[1].strip()
+
+pattern = re.compile(
+    r"^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: [^\s].+$"
+)
+
+emoji_pattern = re.compile(r"[\U0001F1E6-\U0001F1FF\U0001F300-\U0001FAFF\U00002700-\U000027BF]")
+
+if emoji_pattern.search(line):
+    print("Erro: commit message nao pode conter emoji.", file=sys.stderr)
+    print("Exemplo valido: chore: add gitignore rules", file=sys.stderr)
+    sys.exit(1)
+
+if not pattern.match(line):
+    print("Erro: commit message fora do padrao.", file=sys.stderr)
+    print("Use: <tipo>(<escopo opcional>): <descricao>", file=sys.stderr)
+    print("Tipos: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert", file=sys.stderr)
+    print("Exemplo valido: chore: add gitignore rules", file=sys.stderr)
+    sys.exit(1)
+PY
