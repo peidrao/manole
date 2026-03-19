@@ -16,12 +16,14 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
     "@testing-library/jest-dom": "6.8.0",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
     "@types/node": "22.17.1",
     "@types/react": "19.1.9",
     "@types/react-dom": "19.1.7",
+    "eslint": "^10.0.3",
     "jsdom": "26.1.0",
     "typescript": "5.9.2",
     "vitest": "2.1.9"
