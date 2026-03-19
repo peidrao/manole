@@ -8,13 +8,13 @@ from .database import Base
 
 
 class TaskStatus(str, Enum):
-    PENDING = 'pendente'
-    IN_PROGRESS = 'em_andamento'
-    COMPLETED = 'concluida'
+    PENDING = "pendente"
+    IN_PROGRESS = "em_andamento"
+    COMPLETED = "concluida"
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
@@ -22,15 +22,19 @@ class User(Base):
 
 
 class Task(Base):
-    __tablename__ = 'tasks'
+    __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(120), nullable=False)
-    description: Mapped[str] = mapped_column(Text, default='', nullable=False)
+    description: Mapped[str] = mapped_column(Text, default="", nullable=False)
     status: Mapped[TaskStatus] = mapped_column(
-        SqlEnum(TaskStatus, name='task_status_enum', values_callable=lambda obj: [e.value for e in obj]),
+        SqlEnum(
+            TaskStatus, name="task_status_enum", values_callable=lambda obj: [e.value for e in obj]
+        ),
         default=TaskStatus.PENDING,
         nullable=False,
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)

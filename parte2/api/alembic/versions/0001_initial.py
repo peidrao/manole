@@ -14,12 +14,12 @@ from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0001_initial'
+revision: str = "0001_initial"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-TASK_STATUS_ENUM = ('pendente', 'em_andamento', 'concluida')
+TASK_STATUS_ENUM = ("pendente", "em_andamento", "concluida")
 
 
 def upgrade() -> None:
@@ -37,42 +37,42 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        'users',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('email', sa.String(length=255), nullable=False),
-        sa.Column('password_hash', sa.String(length=255), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
+        "users",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("email", sa.String(length=255), nullable=False),
+        sa.Column("password_hash", sa.String(length=255), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
-    op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
+    op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
+    op.create_index(op.f("ix_users_id"), "users", ["id"], unique=False)
 
     op.create_table(
-        'tasks',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('title', sa.String(length=120), nullable=False),
-        sa.Column('description', sa.Text(), nullable=False),
+        "tasks",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("title", sa.String(length=120), nullable=False),
+        sa.Column("description", sa.Text(), nullable=False),
         # create_type=False evita que SQLAlchemy emita CREATE TYPE novamente
         sa.Column(
-            'status',
-            postgresql.ENUM(*TASK_STATUS_ENUM, name='task_status_enum', create_type=False),
+            "status",
+            postgresql.ENUM(*TASK_STATUS_ENUM, name="task_status_enum", create_type=False),
             nullable=False,
         ),
-        sa.Column('created_at', sa.DateTime(), nullable=False),
-        sa.Column('owner_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['owner_id'], ['users.id']),
-        sa.PrimaryKeyConstraint('id'),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.Column("owner_id", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(["owner_id"], ["users.id"]),
+        sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(op.f('ix_tasks_id'), 'tasks', ['id'], unique=False)
-    op.create_index(op.f('ix_tasks_owner_id'), 'tasks', ['owner_id'], unique=False)
+    op.create_index(op.f("ix_tasks_id"), "tasks", ["id"], unique=False)
+    op.create_index(op.f("ix_tasks_owner_id"), "tasks", ["owner_id"], unique=False)
 
 
 def downgrade() -> None:
-    op.drop_index(op.f('ix_tasks_owner_id'), table_name='tasks')
-    op.drop_index(op.f('ix_tasks_id'), table_name='tasks')
-    op.drop_table('tasks')
+    op.drop_index(op.f("ix_tasks_owner_id"), table_name="tasks")
+    op.drop_index(op.f("ix_tasks_id"), table_name="tasks")
+    op.drop_table("tasks")
 
-    op.drop_index(op.f('ix_users_id'), table_name='users')
-    op.drop_index(op.f('ix_users_email'), table_name='users')
-    op.drop_table('users')
+    op.drop_index(op.f("ix_users_id"), table_name="users")
+    op.drop_index(op.f("ix_users_email"), table_name="users")
+    op.drop_table("users")
 
-    op.execute('DROP TYPE IF EXISTS task_status_enum')
+    op.execute("DROP TYPE IF EXISTS task_status_enum")

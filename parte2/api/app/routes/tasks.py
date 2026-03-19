@@ -7,17 +7,17 @@ from ..database import get_db
 from ..models import Task, TaskStatus, User
 from ..schemas import TaskCreate, TaskResponse, TasksListResponse, TaskUpdate
 
-router = APIRouter(prefix='/tasks', tags=['tasks'])
+router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 def get_task_or_404(task_id: int, owner_id: int, db: Session) -> Task:
     task = db.query(Task).filter(Task.id == task_id, Task.owner_id == owner_id).first()
     if not task:
-        raise HTTPException(status_code=404, detail='Tarefa não encontrada')
+        raise HTTPException(status_code=404, detail="Tarefa não encontrada")
     return task
 
 
-@router.post('', response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 def create_task(
     payload: TaskCreate,
     db: Session = Depends(get_db),
@@ -35,11 +35,11 @@ def create_task(
     return task
 
 
-@router.get('', response_model=TasksListResponse)
+@router.get("", response_model=TasksListResponse)
 def list_tasks(
     page: int = Query(default=1, ge=1),
     per_page: int = Query(default=10, ge=1, le=100),
-    status_filter: TaskStatus | None = Query(default=None, alias='status'),
+    status_filter: TaskStatus | None = Query(default=None, alias="status"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -54,7 +54,7 @@ def list_tasks(
     return TasksListResponse(page=page, per_page=per_page, total=total, items=items)
 
 
-@router.get('/{task_id}', response_model=TaskResponse)
+@router.get("/{task_id}", response_model=TaskResponse)
 def get_task(
     task_id: int,
     db: Session = Depends(get_db),
@@ -63,7 +63,7 @@ def get_task(
     return get_task_or_404(task_id, current_user.id, db)
 
 
-@router.put('/{task_id}', response_model=TaskResponse)
+@router.put("/{task_id}", response_model=TaskResponse)
 def update_task(
     task_id: int,
     payload: TaskUpdate,
@@ -81,7 +81,7 @@ def update_task(
     return task
 
 
-@router.delete('/{task_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(
     task_id: int,
     db: Session = Depends(get_db),
