@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from sqlalchemy import DateTime, Enum as SqlEnum, ForeignKey, Integer, String, Text
@@ -32,5 +32,5 @@ class Task(Base):
         default=TaskStatus.PENDING,
         nullable=False,
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False, index=True)
