@@ -11,16 +11,15 @@ type Props = {
 
 export function AuthForm({ onLogin, onRegister, loading, error }: Props) {
   const [tab, setTab] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (tab === 'login') {
-      await onLogin(email, password);
+      await onLogin(form.email, form.password);
     } else {
-      await onRegister(email, password);
+      await onRegister(form.email, form.password);
     }
   };
 
@@ -81,8 +80,8 @@ export function AuthForm({ onLogin, onRegister, loading, error }: Props) {
               <input
                 id="auth-email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                 placeholder="seu@email.com"
                 required
                 autoComplete="email"
@@ -95,8 +94,8 @@ export function AuthForm({ onLogin, onRegister, loading, error }: Props) {
                 <input
                   id="auth-password"
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   placeholder="mínimo 6 caracteres"
                   minLength={6}
                   required

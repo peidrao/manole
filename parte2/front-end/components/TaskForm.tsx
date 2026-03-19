@@ -9,17 +9,18 @@ type Props = {
   loading: boolean;
 };
 
+const INITIAL_FORM = { title: '', description: '', status: 'pendente' as TaskStatus };
+
 export function TaskForm({ onSubmit, loading }: Props) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<TaskStatus>('pendente');
+  const [form, setForm] = useState(INITIAL_FORM);
+
+  const set = <K extends keyof typeof INITIAL_FORM>(key: K, value: (typeof INITIAL_FORM)[K]) =>
+    setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await onSubmit(title, description, status);
-    setTitle('');
-    setDescription('');
-    setStatus('pendente');
+    await onSubmit(form.title, form.description, form.status);
+    setForm(INITIAL_FORM);
   };
 
   return (
@@ -36,8 +37,8 @@ export function TaskForm({ onSubmit, loading }: Props) {
               <input
                 id="task-title"
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={form.title}
+                onChange={(e) => set('title', e.target.value)}
                 placeholder="Ex: Revisar documento..."
                 minLength={1}
                 required
@@ -47,8 +48,8 @@ export function TaskForm({ onSubmit, loading }: Props) {
               <label htmlFor="task-status" className="field-label">Status</label>
               <select
                 id="task-status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                value={form.status}
+                onChange={(e) => set('status', e.target.value as TaskStatus)}
               >
                 <option value="pendente">Pendente</option>
                 <option value="em_andamento">Em andamento</option>
@@ -61,8 +62,8 @@ export function TaskForm({ onSubmit, loading }: Props) {
             <label htmlFor="task-desc" className="field-label">Descrição</label>
             <textarea
               id="task-desc"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={form.description}
+              onChange={(e) => set('description', e.target.value)}
               placeholder="Descreva os detalhes da tarefa (opcional)"
               rows={3}
               style={{ resize: 'vertical' }}
