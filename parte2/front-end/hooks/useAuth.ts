@@ -19,13 +19,16 @@ export function useAuth(addToast: AddToast) {
     if (stored) setToken(stored);
   }, []);
 
+  function persist(accessToken: string) {
+    localStorage.setItem(TOKEN_KEY, accessToken);
+    setToken(accessToken);
+  }
+
   async function handleLogin(email: string, password: string) {
+    setLoading(true);
+    setError('');
     try {
-      setLoading(true);
-      setError('');
-      const accessToken = await login({ email, password });
-      localStorage.setItem(TOKEN_KEY, accessToken);
-      setToken(accessToken);
+      persist(await login({ email, password }));
       addToast('Login realizado com sucesso!', 'success');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao fazer login');
@@ -35,13 +38,11 @@ export function useAuth(addToast: AddToast) {
   }
 
   async function handleRegister(email: string, password: string) {
+    setLoading(true);
+    setError('');
     try {
-      setLoading(true);
-      setError('');
       await register({ email, password });
-      const accessToken = await login({ email, password });
-      localStorage.setItem(TOKEN_KEY, accessToken);
-      setToken(accessToken);
+      persist(await login({ email, password }));
       addToast('Conta criada com sucesso! Bem-vindo.', 'success');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao registrar usuário');
@@ -56,13 +57,5 @@ export function useAuth(addToast: AddToast) {
     setError('');
   }
 
-  return {
-    token,
-    isAuthenticated: !!token,
-    error,
-    loading,
-    handleLogin,
-    handleRegister,
-    handleLogout,
-  };
+  return { token, isAuthenticated: !!token, error, loading, handleLogin, handleRegister, handleLogout };
 }
