@@ -10,6 +10,13 @@ from ..schemas import TaskCreate, TaskResponse, TasksListResponse, TaskUpdate
 router = APIRouter(prefix='/tasks', tags=['tasks'])
 
 
+def get_task_or_404(task_id: int, owner_id: int, db: Session) -> Task:
+    task = db.query(Task).filter(Task.id == task_id, Task.owner_id == owner_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail='Tarefa não encontrada')
+    return task
+
+
 @router.post('', response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 def create_task(
     payload: TaskCreate,
@@ -53,10 +60,7 @@ def get_task(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    task = db.query(Task).filter(Task.id == task_id, Task.owner_id == current_user.id).first()
-    if not task:
-        raise HTTPException(status_code=404, detail='Tarefa não encontrada')
-    return task
+    return get_task_or_404(task_id, current_user.id, db)
 
 
 @router.put('/{task_id}', response_model=TaskResponse)
@@ -66,9 +70,7 @@ def update_task(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    task = db.query(Task).filter(Task.id == task_id, Task.owner_id == current_user.id).first()
-    if not task:
-        raise HTTPException(status_code=404, detail='Tarefa não encontrada')
+    task = get_task_or_404(task_id, current_user.id, db)
 
     task.title = payload.title
     task.description = payload.description
@@ -85,10 +87,6 @@ def delete_task(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    task = db.query(Task).filter(Task.id == task_id, Task.owner_id == current_user.id).first()
-    if not task:
-        raise HTTPException(status_code=404, detail='Tarefa não encontrada')
-
+    task = get_task_or_404(task_id, current_user.id, db)
     db.delete(task)
     db.commit()
-    return None
