@@ -18,7 +18,7 @@ const STATUS_FILTERS: { label: string; value: TaskStatus | '' }[] = [
 export default function HomePage() {
   const { toasts, addToast, removeToast } = useToast();
   const { token, isAuthenticated, error: authError, loading: authLoading, handleLogin, handleRegister, handleLogout } = useAuth(addToast);
-  const { tasks, loading: tasksLoading, statusFilter, setStatusFilter, handleCreateTask, handleDeleteTask, handleChangeStatus } = useTasks(token, addToast);
+  const { tasks, loading: tasksLoading, statusFilter, setStatusFilter, page, setPage, total, totalPages, handleCreateTask, handleDeleteTask, handleChangeStatus } = useTasks(token, addToast);
 
   return (
     <>
@@ -69,6 +69,29 @@ export default function HomePage() {
                   onDelete={handleDeleteTask}
                   onChangeStatus={handleChangeStatus}
                 />
+
+                {totalPages > 1 && (
+                  <div className="pagination">
+                    <button
+                      className="pagination-btn"
+                      onClick={() => setPage((p) => p - 1)}
+                      disabled={page === 1 || tasksLoading}
+                    >
+                      ‹ Anterior
+                    </button>
+                    <span className="pagination-info">
+                      {page} de {totalPages}
+                      <span className="pagination-total"> ({total} tarefas)</span>
+                    </span>
+                    <button
+                      className="pagination-btn"
+                      onClick={() => setPage((p) => p + 1)}
+                      disabled={page === totalPages || tasksLoading}
+                    >
+                      Próxima ›
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </main>
