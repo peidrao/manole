@@ -461,6 +461,51 @@ input::placeholder, textarea::placeholder { color: #B0ADA7; }
 
 .status-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(200, 132, 26, 0.12); }
 
+/* ─── PAGINATION ─────────────────────────────────────────── */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  gap: 8px;
+}
+
+.pagination-btn {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: all var(--t);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: var(--primary-border);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.pagination-total {
+  font-size: 0.8125rem;
+  color: #9CA3AF;
+}
+
 /* ─── TOAST ──────────────────────────────────────────────── */
 
 .toast-container {
@@ -601,4 +646,13 @@ input::placeholder, textarea::placeholder { color: #B0ADA7; }
   .task-form-row { grid-template-columns: 1fr; }
   .app-header { padding: 0 16px; }
   .app-content { padding: 20px 16px 48px; }
+
+  /* Prevent iOS auto-zoom on focus (requires font-size >= 16px) */
+  input[type='email'],
+  input[type='password'],
+  input[type='text'],
+  textarea,
+  select {
+    font-size: 1rem;
+  }
 }
