@@ -26,8 +26,4 @@ function analisarNumeros(lista) {
   };
 }
 
-// Exemplo de uso
-const entrada = [1, 2, 3, 4, 5, 'a', null, undefined];
-console.log(analisarNumeros(entrada));
-
 module.exports = { analisarNumeros };

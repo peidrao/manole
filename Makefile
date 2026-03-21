@@ -2,7 +2,7 @@
         up down logs build \
         api-install api-migrate api-dev \
         front-install front-dev \
-        test test-api test-front \
+        test test-api test-front test-parte1 \
         parte1
 
 # ─── variáveis ──────────────────────────────────────────────
@@ -30,9 +30,10 @@ help:
 	@echo "    make front-dev      Sobe o frontend localmente (sem Docker)"
 	@echo ""
 	@echo "  Testes"
-	@echo "    make test        Roda testes do backend e do frontend"
-	@echo "    make test-api    Roda apenas os testes do backend"
-	@echo "    make test-front  Roda apenas os testes do frontend"
+	@echo "    make test          Roda todos os testes"
+	@echo "    make test-api      Roda apenas os testes do backend"
+	@echo "    make test-front    Roda apenas os testes do frontend"
+	@echo "    make test-parte1   Roda apenas os testes da parte 1"
 	@echo ""
 	@echo "  Parte 1"
 	@echo "    make parte1      Executa o script de lógica (Node.js)"
@@ -72,13 +73,16 @@ front-dev: front-install
 	cd $(FRONT_DIR) && cp -n .env.example .env.local 2>/dev/null || true && npm run dev
 
 # ─── testes ──────────────────────────────────────────────────
-test: test-api test-front
+test: test-api test-front test-parte1
 
 test-api:
 	cd $(API_DIR) && . .venv/bin/activate && pytest -q
 
 test-front:
 	cd $(FRONT_DIR) && npm install && npm run test
+
+test-parte1:
+	node --test parte1/index.test.js
 
 # ─── parte 1 ─────────────────────────────────────────────────
 parte1:
