@@ -29,7 +29,9 @@ class Task(Base):
     title: Mapped[str] = mapped_column(String(120))
     description: Mapped[str] = mapped_column(Text, default="")
     status: Mapped[TaskStatus] = mapped_column(
-        SqlEnum(TaskStatus, name="task_status_enum", values_callable=lambda e: [m.value for m in e]),
+        SqlEnum(
+            TaskStatus, name="task_status_enum", values_callable=lambda e: [m.value for m in e]
+        ),
         default=TaskStatus.PENDING,
     )
     created_at: Mapped[datetime] = mapped_column(
