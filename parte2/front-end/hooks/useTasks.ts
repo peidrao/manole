@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 
 import { createTask, deleteTask, getTasks, updateTask } from '@/lib/api';
-import { ToastType } from '@/components/Toast';
+import { toMessage } from '@/lib/utils';
+import { AddToast } from '@/components/Toast';
 import { Task, TaskStatus } from '@/types/task';
 
 const PER_PAGE = 10;
-
-type AddToast = (message: string, type: ToastType) => void;
 
 export function useTasks(token: string, addToast: AddToast) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -28,10 +27,15 @@ export function useTasks(token: string, addToast: AddToast) {
         setTasks(data.items);
         setTotal(data.total);
       })
-      .catch((err) => addToast(err instanceof Error ? err.message : 'Erro ao carregar tarefas', 'error'))
+      .catch((err) => addToast(toMessage(err, 'Erro ao carregar tarefas'), 'error'))
       .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, statusFilter, page]);
+  }, [token, statusFilter, page, addToast]);
+
+  async function fetchAndSync(targetPage: number) {
+    const data = await getTasks(token, statusFilter || undefined, targetPage, PER_PAGE);
+    setTasks(data.items);
+    setTotal(data.total);
+  }
 
   function handleFilterChange(filter: TaskStatus | '') {
     setStatusFilter(filter);
@@ -42,12 +46,10 @@ export function useTasks(token: string, addToast: AddToast) {
     try {
       await createTask(token, { title, description, status });
       setPage(1);
-      const data = await getTasks(token, statusFilter || undefined, 1, PER_PAGE);
-      setTasks(data.items);
-      setTotal(data.total);
+      await fetchAndSync(1);
       addToast('Tarefa criada com sucesso!', 'success');
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Erro ao criar tarefa', 'error');
+      addToast(toMessage(err, 'Erro ao criar tarefa'), 'error');
     }
   }
 
@@ -55,13 +57,11 @@ export function useTasks(token: string, addToast: AddToast) {
     try {
       await deleteTask(token, taskId);
       const nextPage = tasks.length === 1 && page > 1 ? page - 1 : page;
-      const data = await getTasks(token, statusFilter || undefined, nextPage, PER_PAGE);
-      setTasks(data.items);
-      setTotal(data.total);
+      await fetchAndSync(nextPage);
       setPage(nextPage);
       addToast('Tarefa excluída.', 'info');
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Erro ao excluir tarefa', 'error');
+      addToast(toMessage(err, 'Erro ao excluir tarefa'), 'error');
     }
   }
 
@@ -69,15 +69,13 @@ export function useTasks(token: string, addToast: AddToast) {
     try {
       const updated = await updateTask(token, task.id, { title: task.title, description: task.description, status });
       if (statusFilter && updated.status !== statusFilter) {
-        const data = await getTasks(token, statusFilter || undefined, page, PER_PAGE);
-        setTasks(data.items);
-        setTotal(data.total);
+        await fetchAndSync(page);
       } else {
         setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
       }
       addToast('Status atualizado!', 'success');
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Erro ao atualizar status', 'error');
+      addToast(toMessage(err, 'Erro ao atualizar status'), 'error');
     }
   }
 
