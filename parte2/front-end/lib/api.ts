@@ -8,6 +8,12 @@ type AuthBody = {
   password: string;
 };
 
+type TaskPayload = {
+  title: string;
+  description: string;
+  status: TaskStatus;
+};
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
@@ -33,15 +39,14 @@ async function request<T>(
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw new Error('Tempo limite excedido ao conectar com a API');
     }
-    throw new Error('Nao foi possivel conectar com a API');
+    throw new Error('Não foi possível conectar com a API');
   } finally {
     clearTimeout(timeoutId);
   }
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    const message = body.detail || 'Erro na requisição';
-    throw new Error(message);
+    throw new Error(body.detail || 'Erro na requisição');
   }
 
   if (response.status === 204) {
@@ -73,32 +78,17 @@ export function getTasks(token: string, status?: TaskStatus, page = 1, perPage =
     params.set('status', status);
   }
 
-  return request<TasksResponse>(`/tasks?${params.toString()}`, {}, token);
+  return request<TasksResponse>(`/tasks?${params}`, {}, token);
 }
 
-export function createTask(
-  token: string,
-  body: { title: string; description: string; status: TaskStatus },
-) {
-  return request<Task>('/tasks', {
-    method: 'POST',
-    body: JSON.stringify(body),
-  }, token);
+export function createTask(token: string, body: TaskPayload) {
+  return request<Task>('/tasks', { method: 'POST', body: JSON.stringify(body) }, token);
 }
 
-export function updateTask(
-  token: string,
-  taskId: number,
-  body: { title: string; description: string; status: TaskStatus },
-) {
-  return request<Task>(`/tasks/${taskId}`, {
-    method: 'PUT',
-    body: JSON.stringify(body),
-  }, token);
+export function updateTask(token: string, taskId: number, body: TaskPayload) {
+  return request<Task>(`/tasks/${taskId}`, { method: 'PUT', body: JSON.stringify(body) }, token);
 }
 
 export function deleteTask(token: string, taskId: number) {
-  return request<void>(`/tasks/${taskId}`, {
-    method: 'DELETE',
-  }, token);
+  return request<void>(`/tasks/${taskId}`, { method: 'DELETE' }, token);
 }
