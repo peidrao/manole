@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export type ToastType = 'success' | 'error' | 'info';
 
@@ -10,19 +10,27 @@ export type Toast = {
   type: ToastType;
 };
 
+export type AddToast = (message: string, type?: ToastType) => void;
+
 let _nextId = 0;
+
+const ICONS: Record<ToastType, string> = {
+  success: '✓',
+  error: '✕',
+  info: 'i',
+};
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  function addToast(message: string, type: ToastType = 'info') {
+  const addToast: AddToast = useCallback((message, type = 'info') => {
     const id = ++_nextId;
     setToasts((prev) => [...prev, { id, message, type }]);
-  }
+  }, []);
 
-  function removeToast(id: number) {
+  const removeToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
-  }
+  }, []);
 
   return { toasts, addToast, removeToast };
 }
@@ -41,21 +49,11 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: number) =
     return () => clearTimeout(remove);
   }, [leaving, toast.id, onRemove]);
 
-  function handleClose() {
-    setLeaving(true);
-  }
-
-  const icons: Record<ToastType, string> = {
-    success: '✓',
-    error: '✕',
-    info: 'i',
-  };
-
   return (
     <div className={`toast toast-${toast.type} ${leaving ? 'toast-leaving' : ''}`} role="status">
-      <span className="toast-icon">{icons[toast.type]}</span>
+      <span className="toast-icon">{ICONS[toast.type]}</span>
       <span className="toast-message">{toast.message}</span>
-      <button className="toast-close" onClick={handleClose} aria-label="Fechar">×</button>
+      <button className="toast-close" onClick={() => setLeaving(true)} aria-label="Fechar">×</button>
     </div>
   );
 }
