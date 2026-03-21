@@ -53,8 +53,7 @@ logs:
 
 # ─── backend ─────────────────────────────────────────────────
 api-install:
-	cd $(API_DIR) && python3 -m venv .venv && \
-	. .venv/bin/activate && pip install -r requirements.txt
+	cd $(API_DIR) && uv sync
 
 api-migrate:
 	cd $(API_DIR) && . .venv/bin/activate && alembic upgrade head
