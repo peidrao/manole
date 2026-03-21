@@ -17,8 +17,30 @@ const STATUS_FILTERS: { label: string; value: TaskStatus | '' }[] = [
 
 export default function HomePage() {
   const { toasts, addToast, removeToast } = useToast();
-  const { token, isAuthenticated, error: authError, loading: authLoading, handleLogin, handleRegister, handleLogout } = useAuth(addToast);
-  const { tasks, loading: tasksLoading, statusFilter, setStatusFilter, page, setPage, total, totalPages, handleCreateTask, handleDeleteTask, handleChangeStatus } = useTasks(token, addToast);
+
+  const {
+    token,
+    isAuthenticated,
+    error: authError,
+    loading: authLoading,
+    handleLogin,
+    handleRegister,
+    handleLogout,
+  } = useAuth(addToast);
+
+  const {
+    tasks,
+    loading: tasksLoading,
+    statusFilter,
+    setStatusFilter,
+    page,
+    setPage,
+    total,
+    totalPages,
+    handleCreateTask,
+    handleDeleteTask,
+    handleChangeStatus,
+  } = useTasks(token, addToast);
 
   return (
     <>
