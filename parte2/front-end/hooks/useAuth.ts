@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react';
 
 import { login, register } from '@/lib/api';
-import { ToastType } from '@/components/Toast';
+import { toMessage } from '@/lib/utils';
+import { AddToast } from '@/components/Toast';
 
 const TOKEN_KEY = 'tasks-token';
-
-type AddToast = (message: string, type: ToastType) => void;
 
 export function useAuth(addToast: AddToast) {
   const [token, setToken] = useState('');
@@ -31,7 +30,7 @@ export function useAuth(addToast: AddToast) {
       persist(await login({ email, password }));
       addToast('Login realizado com sucesso!', 'success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
+      setError(toMessage(err, 'Erro ao fazer login'));
     } finally {
       setLoading(false);
     }
@@ -45,7 +44,7 @@ export function useAuth(addToast: AddToast) {
       persist(await login({ email, password }));
       addToast('Conta criada com sucesso! Bem-vindo.', 'success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao registrar usuário');
+      setError(toMessage(err, 'Erro ao registrar usuário'));
     } finally {
       setLoading(false);
     }
