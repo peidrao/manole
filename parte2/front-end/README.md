@@ -1,16 +1,14 @@
-# Front-end (Next.js)
+# Tasks — Front-end
 
-## Funcionalidades
-- Login e cadastro (JWT)
-- Listar tarefas
-- Criar tarefa
-- Alterar status
-- Excluir tarefa
-- Filtro por status
-- Loading e tratamento de erro
-- Layout responsivo básico
+Interface web para gerenciamento de tarefas, construída com Next.js 15 e React 19. Consome a [Tasks API](../api).
 
-## Rodar local
+## Requisitos
+
+- Node.js 18+
+- Tasks API rodando (ver `../api`)
+
+## Rodando localmente
+
 ```bash
 cd parte2/front-end
 npm install
@@ -20,9 +18,24 @@ npm run dev
 
 A aplicação abre em `http://localhost:3000`.
 
-## Testes unitarios
+## Variáveis de ambiente
+
+| Variável               | Padrão                    | Descrição          |
+| ---------------------- | ------------------------- | ------------------ |
+| `NEXT_PUBLIC_API_URL`  | `http://localhost:8000`   | URL da Tasks API   |
+
+## Funcionalidades
+
+- Cadastro e login com JWT (token persistido em `localStorage`)
+- Criar, atualizar status e excluir tarefas
+- Filtro por status: pendente, em andamento, concluída
+- Paginação da lista de tarefas
+- Layout responsivo
+
+## Testes
+
 ```bash
-cd parte2/front-end
-npm install
-npm run test
+npm test
 ```
+
+Testes unitários com Vitest, cobrindo o cliente HTTP (`lib/api.ts`).
