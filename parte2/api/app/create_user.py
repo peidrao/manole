@@ -27,11 +27,7 @@ def validate_email(email: str) -> str:
 
 
 def resolve_password(raw_password: str | None) -> str:
-    if raw_password:
-        password = raw_password
-    else:
-        password = getpass.getpass("Senha: ")
-
+    password = raw_password or getpass.getpass("Senha: ")
     if len(password) < 6:
         raise ValueError("A senha deve ter pelo menos 6 caracteres")
     return password
