@@ -1,92 +1,105 @@
-# Teste Técnico Fullstack - Solução Completa
+# Tasks — Fullstack
 
-Projeto implementado em 3 blocos:
+Aplicação de gerenciamento de tarefas com autenticação JWT, composta por uma API em FastAPI e uma interface em Next.js.
 
-- `parte1/`: lógica e fundamentos (JavaScript + conceitos)
-- `parte2/api/`: API FastAPI + PostgreSQL + JWT + testes + Docker
-- `parte2/front-end/`: interface em Next.js consumindo a API
+```
+parte1/           lógica em JavaScript + respostas conceituais
+parte2/api/       API REST (FastAPI + PostgreSQL)
+parte2/front-end/ interface web (Next.js 15)
+```
 
-## Comandos rápidos (Makefile)
+## Requisitos
 
-| Comando | Descrição |
-|---|---|
-| `make up` | Sobe todos os serviços com Docker (API + frontend + banco) |
-| `make down` | Para e remove os containers |
-| `make build` | Reconstrói as imagens Docker |
-| `make logs` | Exibe os logs em tempo real |
-| `make api-install` | Cria venv e instala dependências do backend |
-| `make api-migrate` | Aplica as migrações Alembic |
-| `make api-dev` | Sobe a API localmente (sem Docker) |
-| `make front-install` | Instala dependências npm do frontend |
-| `make front-dev` | Sobe o frontend localmente (sem Docker) |
-| `make test` | Roda os testes do backend e do frontend |
-| `make test-api` | Roda apenas os testes do backend |
-| `make test-front` | Roda apenas os testes do frontend |
-| `make parte1` | Executa o script de lógica (Node.js) |
+- Docker e Compose V2 (para rodar tudo junto)
+- Python 3.12+ e [`uv`](https://docs.astral.sh/uv/) (para rodar a API localmente)
+- Node.js 18+ (para rodar o front-end localmente)
 
-> Execute `make` ou `make help` para ver todos os comandos disponíveis.
-
-## Como rodar com Docker
+## Rodando com Docker
 
 ```bash
 make up
 ```
 
-Serviços:
-- API: `http://localhost:8000`
-- Front-end: `http://localhost:3000`
-- PostgreSQL: `localhost:5432`
+Serviços disponíveis após o build:
 
-## Como rodar localmente (sem Docker)
+| Serviço    | Endereço                   |
+| ---------- | -------------------------- |
+| Front-end  | http://localhost:3000      |
+| API        | http://localhost:8000      |
+| API docs   | http://localhost:8000/docs |
+| PostgreSQL | localhost:5432             |
 
-### 1) Parte 1
+## Rodando localmente (sem Docker)
+
+### API
+
+Requer PostgreSQL rodando. Suba só o banco via Docker se preferir:
+
 ```bash
-make parte1
+docker compose up db -d
 ```
 
-> As respostas conceituais (REST vs GraphQL, transações, autenticação vs autorização, cache) estão em `parte1/conceitos.md`.
+Em seguida:
 
-### 2) API (FastAPI)
 ```bash
-make api-install
-make api-migrate
-make api-dev
+make api-install   # cria venv com uv e instala dependências
+make api-migrate   # aplica as migrations Alembic
+make api-dev       # sobe em http://localhost:8000
 ```
 
-### 3) Front-end (Next.js)
+### Front-end
+
 ```bash
-make front-dev
+make front-dev     # instala dependências e sobe em http://localhost:3000
 ```
+
+### Parte 1
+
+```bash
+make parte1        # executa parte1/index.js
+```
+
+As respostas conceituais estão em `parte1/conceitos.md`.
 
 ## Testes
 
 ```bash
-make test          # backend + frontend
-make test-api      # apenas backend
-make test-front    # apenas frontend
+make test          # backend + frontend + parte 1
+make test-api      # pytest (backend)
+make test-front    # vitest (frontend)
 ```
+
+Execute `make` ou `make help` para ver todos os comandos disponíveis.
 
 ## Decisões técnicas
 
-- API em FastAPI com SQLAlchemy para manter simplicidade e produtividade.
-- JWT adicionado para proteger o CRUD de tarefas.
-- Separação por camadas no backend (`routes`, `schemas` e `models`).
-- Front-end em Next.js com TypeScript, componentes separados e hooks.
-- Filtro por status e paginação implementados no endpoint `GET /tasks`.
-- Testes unitários/funcionais de API com `pytest` + `TestClient`.
+- **JWT sem refresh token** — escopo intencional; o token expira em 60 minutos. Adicionar refresh token seria o próximo passo natural.
+- **Paginação e filtro por status na API** — implementados diretamente em `GET /tasks` via query params (`page`, `per_page`, `status`).
+- **SQLite nos testes do backend** — os testes sobem um banco em memória, sem precisar de PostgreSQL rodando.
+- **Cobertura de testes do front-end** — cobre o cliente HTTP (`lib/api.ts`); testes de componentes não foram incluídos no escopo.
 
 ## O que eu melhoraria com mais tempo
 
-- Refresh token + expiração mais robusta para JWT.
-- Melhorias de UX no front (edição completa da tarefa, feedback visual mais rico).
+- **Refresh token + httpOnly cookie** — o token hoje fica em `localStorage`, vulnerável a XSS. Mover para cookie httpOnly e adicionar refresh token resolveriam os dois problemas juntos.
+- **PATCH no lugar de PUT** — o endpoint `PUT /tasks/{id}` exige todos os campos; PATCH permitiria atualização parcial e viabilizaria a edição inline de título e descrição no front.
+- **Edição completa da tarefa no front** — hoje só o status é editável. Título e descrição exigem excluir e recriar.
+- **Rate limiting nos endpoints de autenticação** — `/auth/login` e `/auth/register` não têm proteção contra brute force.
+- **CORS restrito** — `allow_origins=["*"]` funciona para desenvolvimento, mas em produção precisaria ser limitado às origens reais.
+- **Filtro de status persistido na URL** — usar query param `?status=pendente` permitiria compartilhar links e respeitar navegação do browser (back/forward).
+- **React Query ou SWR** — substituiria o fetch manual com `useEffect` por uma solução de server state com cache, revalidação e menos código.
 
 ## Pontos fortes e limitações
 
-Pontos fortes:
-- Entrega completa dos requisitos obrigatórios e diferenciais pedidos.
-- Estrutura simples, fácil de entender e evoluir.
-- Backend com autenticação e cobertura inicial de testes.
+**Pontos fortes**
+- Entrega completa dos requisitos obrigatórios e diferenciais.
+- Backend usa SQLAlchemy 2.0 com `Mapped` types e Alembic para migrations — tooling moderno, não o padrão legado ainda comum em projetos FastAPI.
+- Testes do backend com isolamento real — SQLite em memória, sem dependência de PostgreSQL rodando.
+- Hooks bem separados no front (`useAuth`, `useTasks`) — page.tsx orquestra sem lógica de negócio.
+- UX cuidada em ações destrutivas: modal de confirmação antes de excluir, toast de feedback em todas as operações.
+- Estrutura simples e fácil de evoluir — sem over-engineering.
 
-Limitações:
-- Cobertura de testes do frontend ainda inicial (componentes e cliente HTTP).
-- Segurança JWT mínima para contexto de teste técnico (sem refresh token).
+**Limitações**
+- Token em `localStorage` — vulnerável a XSS; httpOnly cookie seria mais seguro.
+- Sem testes de componentes no front-end — cobertura cobre apenas o cliente HTTP (`lib/api.ts`).
+- Edição de tarefa parcial — só status é editável inline; título e descrição não têm formulário de edição.
+- CORS aberto (`allow_origins=["*"]`) — adequado para desenvolvimento, inviável em produção.
