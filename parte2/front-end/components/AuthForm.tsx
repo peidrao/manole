@@ -36,85 +36,85 @@ export function AuthForm({ onLogin, onRegister, loading, error }: Props) {
           </p>
         </div>
 
-          <div className="auth-tabs">
-            <button
-              type="button"
-              className={`auth-tab ${tab === 'login' ? 'active' : ''}`}
-              onClick={() => setTab('login')}
-            >
-              Entrar
-            </button>
-            <button
-              type="button"
-              className={`auth-tab ${tab === 'register' ? 'active' : ''}`}
-              onClick={() => setTab('register')}
-            >
-              Criar conta
-            </button>
+        <div className="auth-tabs">
+          <button
+            type="button"
+            className={`auth-tab ${tab === 'login' ? 'active' : ''}`}
+            onClick={() => setTab('login')}
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            className={`auth-tab ${tab === 'register' ? 'active' : ''}`}
+            onClick={() => setTab('register')}
+          >
+            Criar conta
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="field">
+            <label htmlFor="auth-email" className="field-label">E-mail</label>
+            <input
+              id="auth-email"
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              placeholder="seu@email.com"
+              required
+              autoComplete="email"
+            />
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="field">
-              <label htmlFor="auth-email" className="field-label">E-mail</label>
+          <div className="field">
+            <label htmlFor="auth-password" className="field-label">Senha</label>
+            <div className="input-wrap">
               <input
-                id="auth-email"
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                placeholder="seu@email.com"
+                id="auth-password"
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                placeholder="mínimo 6 caracteres"
+                minLength={6}
                 required
-                autoComplete="email"
+                autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
               />
+              <button
+                type="button"
+                className="input-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? 'Ocultar' : 'Mostrar'}
+              </button>
             </div>
+          </div>
 
-            <div className="field">
-              <label htmlFor="auth-password" className="field-label">Senha</label>
-              <div className="input-wrap">
-                <input
-                  id="auth-password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  placeholder="mínimo 6 caracteres"
-                  minLength={6}
-                  required
-                  autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
-                />
-                <button
-                  type="button"
-                  className="input-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                >
-                  {showPassword ? 'Ocultar' : 'Mostrar'}
-                </button>
-              </div>
-            </div>
+          {error && <p className="error-msg">{error}</p>}
 
-            {error && <p className="error-msg">{error}</p>}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Aguarde...' : tab === 'login' ? 'Entrar' : 'Criar conta'}
+          </button>
+        </form>
 
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Aguarde...' : tab === 'login' ? 'Entrar' : 'Criar conta'}
-            </button>
-          </form>
-
-          <p className="auth-footer">
-            {tab === 'login' ? (
-              <>
-                Não tem conta?{' '}
-                <button type="button" className="link-btn" onClick={() => setTab('register')}>
-                  Criar conta
-                </button>
-              </>
-            ) : (
-              <>
-                Já tem conta?{' '}
-                <button type="button" className="link-btn" onClick={() => setTab('login')}>
-                  Entrar
-                </button>
-              </>
-            )}
-          </p>
+        <p className="auth-footer">
+          {tab === 'login' ? (
+            <>
+              Não tem conta?{' '}
+              <button type="button" className="link-btn" onClick={() => setTab('register')}>
+                Criar conta
+              </button>
+            </>
+          ) : (
+            <>
+              Já tem conta?{' '}
+              <button type="button" className="link-btn" onClick={() => setTab('login')}>
+                Entrar
+              </button>
+            </>
+          )}
+        </p>
       </div>
     </div>
   );
