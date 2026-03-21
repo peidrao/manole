@@ -1,51 +1,93 @@
-# Parte 2 - API FastAPI
+# Tasks API
 
-## Recursos implementados
-- CRUD completo de tarefas
-- Validação com Pydantic
-- Persistência com SQLAlchemy
-- JWT (registro/login)
-- Paginação (`page`, `per_page`)
-- Filtro por status (`status`)
-- Testes automatizados com `pytest`
-- Docker + PostgreSQL
+API REST para gerenciamento de tarefas com autenticação JWT. Construída com FastAPI, PostgreSQL e SQLAlchemy.
 
-## Endpoints
-- `POST /auth/register`
-- `POST /auth/login`
-- `POST /tasks`
-- `GET /tasks`
-- `GET /tasks/{id}`
-- `PUT /tasks/{id}`
-- `DELETE /tasks/{id}`
+## Requisitos
 
-## Rodar local
+- Python 3.12+
+- PostgreSQL 16 (ou Docker)
+
+## Rodando localmente
+
+**1. Ambiente e dependências**
+
 ```bash
 cd parte2/api
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e .
+```
+
+**2. Banco de dados**
+
+Suba o PostgreSQL via Docker (recomendado):
+
+```bash
+docker compose up db -d
+```
+
+Ou aponte para um banco existente via variável de ambiente:
+
+```bash
 export DATABASE_URL='postgresql+psycopg://postgres:postgres@localhost:5432/tasks_db'
+```
+
+**3. Migrations e servidor**
+
+```bash
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-## Migrações com Alembic
+A API estará disponível em `http://localhost:8000`. A documentação interativa fica em `/docs`.
+
+## Rodando com Docker (API + banco)
+
 ```bash
-cd parte2/api
-alembic revision -m "descricao_da_migracao"
-alembic upgrade head
-alembic downgrade -1
+docker compose up --build
 ```
 
-## Rodar testes
+> Altere `JWT_SECRET` no `docker-compose.yml` antes de usar em produção.
+
+## Variáveis de ambiente
+
+| Variável                      | Padrão                                                    | Descrição                        |
+| ----------------------------- | --------------------------------------------------------- | -------------------------------- |
+| `DATABASE_URL`                | `postgresql+psycopg://postgres:postgres@db:5432/tasks_db` | URL de conexão com o banco       |
+| `JWT_SECRET`                  | `super-secret-change-me`                                  | Chave de assinatura dos tokens   |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `60`                                                      | Validade do token de acesso      |
+
+## Endpoints
+
+| Método   | Rota              | Auth | Descrição                        |
+| -------- | ----------------- | ---- | -------------------------------- |
+| `POST`   | `/auth/register`  | —    | Cadastro de usuário              |
+| `POST`   | `/auth/login`     | —    | Login, retorna JWT               |
+| `GET`    | `/tasks`          | ✓    | Lista tarefas (paginação + filtro por status) |
+| `POST`   | `/tasks`          | ✓    | Cria tarefa                      |
+| `GET`    | `/tasks/{id}`     | ✓    | Detalhe de uma tarefa            |
+| `PUT`    | `/tasks/{id}`     | ✓    | Atualiza tarefa                  |
+| `DELETE` | `/tasks/{id}`     | ✓    | Remove tarefa                    |
+
+Parâmetros de query em `GET /tasks`: `page`, `per_page`, `status` (`pendente` | `em_andamento` | `concluida`).
+
+## Testes
+
 ```bash
-cd parte2/api
 pytest -q
 ```
 
-## Rodar com Docker
+Os testes usam SQLite em memória e não precisam do banco PostgreSQL.
+
+## Migrations
+
 ```bash
-cd parte2/api
-docker compose up --build
+# criar nova migration
+alembic revision --autogenerate -m "descricao"
+
+# aplicar
+alembic upgrade head
+
+# reverter uma migration
+alembic downgrade -1
 ```
