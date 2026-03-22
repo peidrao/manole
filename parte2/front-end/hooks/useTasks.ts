@@ -43,6 +43,7 @@ export function useTasks(token: string, addToast: AddToast) {
   }
 
   async function handleCreateTask(title: string, description: string, status: TaskStatus) {
+    setLoading(true);
     try {
       await createTask(token, { title, description, status });
       setPage(1);
@@ -50,10 +51,13 @@ export function useTasks(token: string, addToast: AddToast) {
       addToast('Tarefa criada com sucesso!', 'success');
     } catch (err) {
       addToast(toMessage(err, 'Erro ao criar tarefa'), 'error');
+    } finally {
+      setLoading(false);
     }
   }
 
   async function handleDeleteTask(taskId: number) {
+    setLoading(true);
     try {
       await deleteTask(token, taskId);
       const nextPage = tasks.length === 1 && page > 1 ? page - 1 : page;
@@ -62,10 +66,13 @@ export function useTasks(token: string, addToast: AddToast) {
       addToast('Tarefa excluída.', 'info');
     } catch (err) {
       addToast(toMessage(err, 'Erro ao excluir tarefa'), 'error');
+    } finally {
+      setLoading(false);
     }
   }
 
   async function handleChangeStatus(task: Task, status: TaskStatus) {
+    setLoading(true);
     try {
       const updated = await updateTask(token, task.id, { title: task.title, description: task.description, status });
       if (statusFilter && updated.status !== statusFilter) {
@@ -76,6 +83,8 @@ export function useTasks(token: string, addToast: AddToast) {
       addToast('Status atualizado!', 'success');
     } catch (err) {
       addToast(toMessage(err, 'Erro ao atualizar status'), 'error');
+    } finally {
+      setLoading(false);
     }
   }
 
