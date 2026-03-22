@@ -37,7 +37,7 @@ def main() -> int:
     args = parse_args()
 
     try:
-        email = validate_email(args.email)
+        email = validate_email(args.email).lower()
         password = resolve_password(args.password)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
