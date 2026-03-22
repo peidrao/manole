@@ -35,6 +35,6 @@ class Task(Base):
         default=TaskStatus.PENDING,
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
     )
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
