@@ -1,10 +1,12 @@
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Task, TaskStatus, User
-from ..schemas import TaskCreate, TaskResponse, TasksListResponse, TaskUpdate
+from ..schemas import TaskCreate, TaskPatch, TaskResponse, TasksListResponse
 from ..utils.auth import get_current_user
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -31,7 +33,6 @@ def create_task(
     )
     db.add(task)
     db.commit()
-    db.refresh(task)
     return task
 
 
@@ -63,21 +64,20 @@ def get_task(
     return get_task_or_404(task_id, current_user.id, db)
 
 
-@router.put("/{task_id}", response_model=TaskResponse)
+@router.patch("/{task_id}", response_model=TaskResponse)
 def update_task(
     task_id: int,
-    payload: TaskUpdate,
+    payload: TaskPatch,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     task = get_task_or_404(task_id, current_user.id, db)
 
-    task.title = payload.title
-    task.description = payload.description
-    task.status = payload.status
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(task, field, value)
+    task.updated_at = datetime.now(UTC)
 
     db.commit()
-    db.refresh(task)
     return task
 
 
