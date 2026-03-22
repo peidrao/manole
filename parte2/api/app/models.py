@@ -37,4 +37,5 @@ class Task(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
     )
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)

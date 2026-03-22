@@ -44,7 +44,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
-    op.create_index(op.f("ix_users_id"), "users", ["id"], unique=False)
 
     op.create_table(
         "tasks",
@@ -57,21 +56,18 @@ def upgrade() -> None:
             postgresql.ENUM(*TASK_STATUS_ENUM, name="task_status_enum", create_type=False),
             nullable=False,
         ),
-        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("owner_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["owner_id"], ["users.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(op.f("ix_tasks_id"), "tasks", ["id"], unique=False)
     op.create_index(op.f("ix_tasks_owner_id"), "tasks", ["owner_id"], unique=False)
 
 
 def downgrade() -> None:
     op.drop_index(op.f("ix_tasks_owner_id"), table_name="tasks")
-    op.drop_index(op.f("ix_tasks_id"), table_name="tasks")
     op.drop_table("tasks")
 
-    op.drop_index(op.f("ix_users_id"), table_name="users")
     op.drop_index(op.f("ix_users_email"), table_name="users")
     op.drop_table("users")
 
