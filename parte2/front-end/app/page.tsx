@@ -31,6 +31,7 @@ export default function HomePage() {
   const {
     tasks,
     loading: tasksLoading,
+    isCreating,
     statusFilter,
     setStatusFilter,
     page,
@@ -66,16 +67,17 @@ export default function HomePage() {
           </header>
 
           <main className="app-content">
-            <TaskForm onSubmit={handleCreateTask} loading={tasksLoading} />
+            <TaskForm onSubmit={handleCreateTask} loading={isCreating} />
 
             <div className="card">
-              <div className="card-header" style={{ paddingBottom: '14px' }}>
+              <div className="card-header card-header--filter">
                 <h2>Lista de tarefas</h2>
-                <div className="filter-bar" style={{ marginTop: '12px', marginBottom: 0 }}>
+                <div className="filter-bar">
                   {STATUS_FILTERS.map((f) => (
                     <button
                       key={f.value}
                       className={`filter-pill ${statusFilter === f.value ? 'active' : ''}`}
+                      aria-pressed={statusFilter === f.value}
                       onClick={() => setStatusFilter(f.value)}
                     >
                       {f.label}

@@ -57,30 +57,61 @@ describe('api client', () => {
     await expect(login({ email: 'x', password: 'y' })).rejects.toThrow('Credenciais inválidas');
   });
 
-  it('cobre operações de tasks e auth sem erro', async () => {
+  it('register retorna mensagem de sucesso', async () => {
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ message: 'ok' }) })
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 201,
-          json: async () => ({ id: 1, title: 'A', description: '', status: 'pendente', created_at: '' }),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          json: async () => ({ id: 1, title: 'A', description: '', status: 'concluida', created_at: '' }),
-        })
-        .mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) }),
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ message: 'Usuário criado com sucesso' }),
+      }),
     );
 
-    await register({ email: 'user@test.com', password: '123456' });
-    await createTask('token', { title: 'A', description: '', status: 'pendente' });
-    await updateTask('token', 1, { title: 'A', description: '', status: 'concluida' });
-    await deleteTask('token', 1);
+    const result = await register({ email: 'user@test.com', password: '123456' });
+    expect(result.message).toBe('Usuário criado com sucesso');
+  });
 
-    expect(fetch).toHaveBeenCalledTimes(4);
+  it('createTask retorna a tarefa criada', async () => {
+    const task = { id: 1, title: 'Nova tarefa', description: '', status: 'pendente', created_at: '2026-01-01T00:00:00Z' };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => task }),
+    );
+
+    const result = await createTask('token', { title: 'Nova tarefa', description: '', status: 'pendente' });
+    expect(result).toEqual(task);
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/tasks',
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('updateTask envia PATCH com apenas os campos fornecidos', async () => {
+    const updated = { id: 1, title: 'A', description: '', status: 'concluida', created_at: '' };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => updated }),
+    );
+
+    const result = await updateTask('token', 1, { status: 'concluida' });
+    expect(result.status).toBe('concluida');
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/tasks/1',
+      expect.objectContaining({ method: 'PATCH' }),
+    );
+  });
+
+  it('deleteTask retorna undefined para resposta 204', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 204, json: async () => ({}) }),
+    );
+
+    const result = await deleteTask('token', 1);
+    expect(result).toBeUndefined();
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/tasks/1',
+      expect.objectContaining({ method: 'DELETE' }),
+    );
   });
 });
