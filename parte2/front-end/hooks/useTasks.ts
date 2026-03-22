@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { createTask, deleteTask, getTasks, updateTask } from '@/lib/api';
 import { toMessage } from '@/lib/utils';
@@ -12,9 +12,15 @@ const PER_PAGE = 10;
 export function useTasks(token: string, addToast: AddToast) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [statusFilter, setStatusFilter] = useState<TaskStatus | ''>('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // addToast é estável (useCallback sem deps) — não precisa estar no array de deps
+  const addToastRef = useRef(addToast);
+  addToastRef.current = addToast;
 
   const totalPages = Math.ceil(total / PER_PAGE);
 
@@ -27,14 +33,18 @@ export function useTasks(token: string, addToast: AddToast) {
         setTasks(data.items);
         setTotal(data.total);
       })
-      .catch((err) => addToast(toMessage(err, 'Erro ao carregar tarefas'), 'error'))
+      .catch((err) => addToastRef.current(toMessage(err, 'Erro ao carregar tarefas'), 'error'))
       .finally(() => setLoading(false));
-  }, [token, statusFilter, page, addToast]);
+  }, [token, statusFilter, page, refreshKey]);
 
-  async function fetchAndSync(targetPage: number) {
-    const data = await getTasks(token, statusFilter || undefined, targetPage, PER_PAGE);
-    setTasks(data.items);
-    setTotal(data.total);
+  // Dispara exatamente um re-fetch: muda página se necessário, ou força refreshKey na mesma página
+  function refresh(targetPage?: number) {
+    const next = targetPage ?? page;
+    if (next !== page) {
+      setPage(next);
+    } else {
+      setRefreshKey((k) => k + 1);
+    }
   }
 
   function handleFilterChange(filter: TaskStatus | '') {
@@ -43,54 +53,47 @@ export function useTasks(token: string, addToast: AddToast) {
   }
 
   async function handleCreateTask(title: string, description: string, status: TaskStatus) {
-    setLoading(true);
+    setIsCreating(true);
     try {
       await createTask(token, { title, description, status });
-      setPage(1);
-      await fetchAndSync(1);
+      refresh(1);
       addToast('Tarefa criada com sucesso!', 'success');
     } catch (err) {
       addToast(toMessage(err, 'Erro ao criar tarefa'), 'error');
     } finally {
-      setLoading(false);
+      setIsCreating(false);
     }
   }
 
   async function handleDeleteTask(taskId: number) {
-    setLoading(true);
     try {
       await deleteTask(token, taskId);
       const nextPage = tasks.length === 1 && page > 1 ? page - 1 : page;
-      await fetchAndSync(nextPage);
-      setPage(nextPage);
+      refresh(nextPage);
       addToast('Tarefa excluída.', 'info');
     } catch (err) {
       addToast(toMessage(err, 'Erro ao excluir tarefa'), 'error');
-    } finally {
-      setLoading(false);
     }
   }
 
   async function handleChangeStatus(task: Task, status: TaskStatus) {
-    setLoading(true);
     try {
-      const updated = await updateTask(token, task.id, { title: task.title, description: task.description, status });
+      const updated = await updateTask(token, task.id, { status });
       if (statusFilter && updated.status !== statusFilter) {
-        await fetchAndSync(page);
+        refresh();
       } else {
         setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
       }
       addToast('Status atualizado!', 'success');
     } catch (err) {
       addToast(toMessage(err, 'Erro ao atualizar status'), 'error');
-    } finally {
-      setLoading(false);
     }
   }
 
   return {
     tasks,
     loading,
+    isCreating,
     statusFilter,
     setStatusFilter: handleFilterChange,
     page,
