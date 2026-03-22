@@ -71,19 +71,43 @@ def test_update_and_delete_task():
     )
     task_id = create_response.json()["id"]
 
-    update_response = client.put(
+    update_response = client.patch(
         f"/tasks/{task_id}",
         headers=headers,
         json={"title": "Atualizada", "description": "ok", "status": "em_andamento"},
     )
     assert update_response.status_code == 200
     assert update_response.json()["status"] == "em_andamento"
+    assert update_response.json()["updated_at"] is not None
 
     delete_response = client.delete(f"/tasks/{task_id}", headers=headers)
     assert delete_response.status_code == 204
 
     get_response = client.get(f"/tasks/{task_id}", headers=headers)
     assert get_response.status_code == 404
+
+
+def test_partial_patch():
+    headers = create_user_and_token()
+
+    create_response = client.post(
+        "/tasks",
+        headers=headers,
+        json={"title": "Original", "description": "desc", "status": "pendente"},
+    )
+    task_id = create_response.json()["id"]
+
+    # atualiza só o status, título deve permanecer
+    patch_response = client.patch(
+        f"/tasks/{task_id}",
+        headers=headers,
+        json={"status": "concluida"},
+    )
+    assert patch_response.status_code == 200
+    data = patch_response.json()
+    assert data["title"] == "Original"
+    assert data["status"] == "concluida"
+    assert data["updated_at"] is not None
 
 
 def test_user_cannot_access_another_users_tasks():
@@ -108,7 +132,7 @@ def test_user_cannot_access_another_users_tasks():
     assert get_resp.status_code == 404
 
     # usuário B não deve conseguir atualizar a tarefa de A
-    put_resp = client.put(
+    put_resp = client.patch(
         f"/tasks/{task_id}",
         headers=headers_b,
         json={"title": "Adulterada", "description": "", "status": "concluida"},
