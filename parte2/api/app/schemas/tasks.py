@@ -11,10 +11,10 @@ class TaskCreate(BaseModel):
     status: TaskStatus = TaskStatus.PENDING
 
 
-class TaskUpdate(BaseModel):
-    title: str = Field(min_length=1, max_length=120)
-    description: str = Field(default="", max_length=1000)
-    status: TaskStatus
+class TaskPatch(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
+    status: TaskStatus | None = None
 
 
 class TaskResponse(BaseModel):
@@ -25,6 +25,7 @@ class TaskResponse(BaseModel):
     description: str
     status: TaskStatus
     created_at: datetime
+    updated_at: datetime | None
 
 
 class TasksListResponse(BaseModel):
