@@ -19,7 +19,9 @@ export function TaskForm({ onSubmit, loading }: Props) {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await onSubmit(form.title, form.description, form.status);
+    const title = form.title.trim();
+    if (!title) return;
+    await onSubmit(title, form.description, form.status);
     setForm(INITIAL_FORM);
   };
 
