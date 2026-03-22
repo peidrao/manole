@@ -45,8 +45,14 @@ async function request<T>(
   }
 
   if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    throw new Error(body.detail || 'Erro na requisição');
+    let detail = 'Erro na requisição';
+    try {
+      const body = await response.json();
+      if (body.detail) detail = body.detail;
+    } catch {
+      // resposta sem corpo JSON — usa mensagem genérica
+    }
+    throw new Error(detail);
   }
 
   if (response.status === 204) {
