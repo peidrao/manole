@@ -49,6 +49,21 @@ docker compose up --build
 
 > Altere `JWT_SECRET` no `docker-compose.yml` antes de usar em produção.
 
+## Usuário de teste
+
+Criado durante o setup inicial via endpoint `/auth/register`:
+
+| Campo  | Valor           |
+| ------ | --------------- |
+| E-mail | test@test.com   |
+| Senha  | 123456          |
+
+Para criar novos usuários via CLI:
+
+```bash
+docker exec -it tasks_api create-user --email seu@email.com --password suasenha
+```
+
 ## Variáveis de ambiente
 
 | Variável                      | Padrão                                                    | Descrição                        |
@@ -59,15 +74,16 @@ docker compose up --build
 
 ## Endpoints
 
-| Método   | Rota              | Auth | Descrição                        |
-| -------- | ----------------- | ---- | -------------------------------- |
-| `POST`   | `/auth/register`  | —    | Cadastro de usuário              |
-| `POST`   | `/auth/login`     | —    | Login, retorna JWT               |
+| Método   | Rota              | Auth | Descrição                                     |
+| -------- | ----------------- | ---- | --------------------------------------------- |
+| `POST`   | `/auth/register`  | —    | Cadastro de usuário                           |
+| `POST`   | `/auth/login`     | —    | Login, retorna JWT                            |
 | `GET`    | `/tasks`          | ✓    | Lista tarefas (paginação + filtro por status) |
-| `POST`   | `/tasks`          | ✓    | Cria tarefa                      |
-| `GET`    | `/tasks/{id}`     | ✓    | Detalhe de uma tarefa            |
-| `PUT`    | `/tasks/{id}`     | ✓    | Atualiza tarefa                  |
-| `DELETE` | `/tasks/{id}`     | ✓    | Remove tarefa                    |
+| `POST`   | `/tasks`          | ✓    | Cria tarefa                                   |
+| `GET`    | `/tasks/{id}`     | ✓    | Detalhe de uma tarefa                         |
+| `PATCH`  | `/tasks/{id}`     | ✓    | Atualiza tarefa (campos opcionais)            |
+| `DELETE` | `/tasks/{id}`     | ✓    | Remove tarefa                                 |
+| `GET`    | `/health`         | —    | Health check                                  |
 
 Parâmetros de query em `GET /tasks`: `page`, `per_page`, `status` (`pendente` | `em_andamento` | `concluida`).
 

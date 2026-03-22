@@ -18,6 +18,25 @@ npm run dev
 
 A aplicação abre em `http://localhost:3000`.
 
+## Rodando com Docker
+
+```bash
+docker compose up --build
+```
+
+A variável `NEXT_PUBLIC_API_URL` é embutida em tempo de build. Para apontar para uma API diferente:
+
+```bash
+docker compose build --build-arg NEXT_PUBLIC_API_URL=http://minha-api.com
+```
+
+## Usuário de teste
+
+| Campo  | Valor           |
+| ------ | --------------- |
+| E-mail | test@test.com   |
+| Senha  | 123456          |
+
 ## Variáveis de ambiente
 
 | Variável               | Padrão                    | Descrição          |
@@ -27,7 +46,7 @@ A aplicação abre em `http://localhost:3000`.
 ## Funcionalidades
 
 - Cadastro e login com JWT (token persistido em `localStorage`)
-- Criar, atualizar status e excluir tarefas
+- Criar, atualizar status parcialmente e excluir tarefas
 - Filtro por status: pendente, em andamento, concluída
 - Paginação da lista de tarefas
 - Layout responsivo
@@ -38,4 +57,4 @@ A aplicação abre em `http://localhost:3000`.
 npm test
 ```
 
-Testes unitários com Vitest, cobrindo o cliente HTTP (`lib/api.ts`).
+Testes unitários com Vitest cobrindo o cliente HTTP (`lib/api.ts`) e o componente `TaskForm`.
