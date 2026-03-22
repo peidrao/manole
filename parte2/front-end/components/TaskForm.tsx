@@ -26,7 +26,7 @@ export function TaskForm({ onSubmit, loading }: Props) {
   };
 
   return (
-    <div className="card" style={{ marginBottom: '20px' }}>
+    <div className="card card--mb">
       <div className="card-header">
         <h2>Nova tarefa</h2>
         <p>Preencha os campos para adicionar uma nova tarefa</p>
@@ -34,7 +34,7 @@ export function TaskForm({ onSubmit, loading }: Props) {
       <div className="card-body">
         <form onSubmit={handleSubmit} className="task-form">
           <div className="task-form-row">
-            <div className="field" style={{ marginBottom: 0 }}>
+            <div className="field">
               <label htmlFor="task-title" className="field-label">Título</label>
               <input
                 id="task-title"
@@ -46,7 +46,7 @@ export function TaskForm({ onSubmit, loading }: Props) {
                 required
               />
             </div>
-            <div className="field" style={{ marginBottom: 0 }}>
+            <div className="field">
               <label htmlFor="task-status" className="field-label">Status</label>
               <select
                 id="task-status"
@@ -60,7 +60,7 @@ export function TaskForm({ onSubmit, loading }: Props) {
             </div>
           </div>
 
-          <div className="field" style={{ marginBottom: 0 }}>
+          <div className="field">
             <label htmlFor="task-desc" className="field-label">Descrição</label>
             <textarea
               id="task-desc"
@@ -68,12 +68,11 @@ export function TaskForm({ onSubmit, loading }: Props) {
               onChange={(e) => set('description', e.target.value)}
               placeholder="Descreva os detalhes da tarefa (opcional)"
               rows={3}
-              style={{ resize: 'vertical' }}
             />
           </div>
 
           <div className="task-form-actions">
-            <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: 'auto', minWidth: 140 }}>
+            <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Salvando...' : '+ Adicionar tarefa'}
             </button>
           </div>

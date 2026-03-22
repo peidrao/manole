@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type ToastType = 'success' | 'error' | 'info';
 
@@ -12,8 +12,6 @@ export type Toast = {
 
 export type AddToast = (message: string, type?: ToastType) => void;
 
-let _nextId = 0;
-
 const ICONS: Record<ToastType, string> = {
   success: '✓',
   error: '✕',
@@ -22,9 +20,10 @@ const ICONS: Record<ToastType, string> = {
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const nextId = useRef(0);
 
   const addToast: AddToast = useCallback((message, type = 'info') => {
-    const id = ++_nextId;
+    const id = ++nextId.current;
     setToasts((prev) => [...prev, { id, message, type }]);
   }, []);
 
