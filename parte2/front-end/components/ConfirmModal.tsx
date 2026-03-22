@@ -12,8 +12,8 @@ export function ConfirmModal({ taskTitle, onConfirm, onCancel }: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!modalRef.current) return;
     const el = modalRef.current;
-    if (!el) return;
 
     const focusableSelectors =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
