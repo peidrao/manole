@@ -88,6 +88,7 @@ export function TaskList({ tasks, loading, onDelete, onChangeStatus }: Props) {
                   value={task.status}
                   onChange={(e) => onChangeStatus(task, e.target.value as TaskStatus)}
                   aria-label="Alterar status"
+                  disabled={deletingId === task.id}
                 >
                   {STATUS_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
