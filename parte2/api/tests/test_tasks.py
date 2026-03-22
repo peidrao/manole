@@ -16,10 +16,9 @@ def setup_function():
     Base.metadata.create_all(bind=engine)
 
 
-def create_user_and_token():
-    register_payload = {"email": "user@test.com", "password": "123456"}
-    client.post("/auth/register", json=register_payload)
-    login_resp = client.post("/auth/login", json=register_payload)
+def create_user_and_token(email: str = "user@test.com", password: str = "123456"):
+    client.post("/auth/register", json={"email": email, "password": password})
+    login_resp = client.post("/auth/login", json={"email": email, "password": password})
     token = login_resp.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
@@ -85,3 +84,37 @@ def test_update_and_delete_task():
 
     get_response = client.get(f"/tasks/{task_id}", headers=headers)
     assert get_response.status_code == 404
+
+
+def test_user_cannot_access_another_users_tasks():
+    headers_a = create_user_and_token("a@test.com", "123456")
+    headers_b = create_user_and_token("b@test.com", "123456")
+
+    create_resp = client.post(
+        "/tasks",
+        headers=headers_a,
+        json={"title": "Tarefa do usuário A", "description": "", "status": "pendente"},
+    )
+    task_id = create_resp.json()["id"]
+
+    # usuário B não deve enxergar a tarefa de A na listagem
+    list_resp = client.get("/tasks", headers=headers_b)
+    assert list_resp.status_code == 200
+    ids = [t["id"] for t in list_resp.json()["items"]]
+    assert task_id not in ids
+
+    # usuário B não deve conseguir acessar a tarefa de A diretamente
+    get_resp = client.get(f"/tasks/{task_id}", headers=headers_b)
+    assert get_resp.status_code == 404
+
+    # usuário B não deve conseguir atualizar a tarefa de A
+    put_resp = client.put(
+        f"/tasks/{task_id}",
+        headers=headers_b,
+        json={"title": "Adulterada", "description": "", "status": "concluida"},
+    )
+    assert put_resp.status_code == 404
+
+    # usuário B não deve conseguir deletar a tarefa de A
+    del_resp = client.delete(f"/tasks/{task_id}", headers=headers_b)
+    assert del_resp.status_code == 404
