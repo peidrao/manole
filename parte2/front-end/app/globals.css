@@ -145,6 +145,8 @@ body {
 
 .input-wrap { position: relative; display: flex; align-items: center; }
 
+textarea { resize: vertical; }
+
 input[type='email'],
 input[type='password'],
 input[type='text'],
@@ -326,11 +328,24 @@ input::placeholder, textarea::placeholder { color: #B0ADA7; }
 
 .divider { border: none; border-top: 1px solid var(--border); }
 
+/* ─── CARDS (modifiers) ──────────────────────────────────── */
+
+.card--mb { margin-bottom: 20px; }
+
+.card-header--filter { padding-bottom: 14px; }
+.card-header--filter .filter-bar { margin-top: 12px; }
+
 /* ─── TASK FORM ──────────────────────────────────────────── */
 
 .task-form { display: grid; gap: 14px; }
 .task-form-row { display: grid; grid-template-columns: 1fr 180px; gap: 12px; }
 .task-form-actions { display: flex; justify-content: flex-end; }
+
+/* Inside the grid, field margin-bottom is handled by the gap */
+.task-form .field { margin-bottom: 0; }
+
+/* Submit button is auto-width inside task form */
+.task-form-actions .btn-primary { width: auto; min-width: 140px; }
 
 /* ─── TASK LIST ──────────────────────────────────────────── */
 
@@ -370,9 +385,9 @@ input::placeholder, textarea::placeholder { color: #B0ADA7; }
   min-height: 40px;
 }
 
-.task-card-indicator.pendente    { background: var(--status-pending); }
-.task-card-indicator.em_andamento { background: var(--status-progress); }
-.task-card-indicator.concluida   { background: var(--status-done); }
+.task-card-indicator.status-pending  { background: var(--status-pending); }
+.task-card-indicator.status-progress { background: var(--status-progress); }
+.task-card-indicator.status-done     { background: var(--status-done); }
 
 .task-card-body { flex: 1; min-width: 0; }
 
@@ -393,7 +408,7 @@ input::placeholder, textarea::placeholder { color: #B0ADA7; }
   text-overflow: ellipsis;
 }
 
-.task-card.concluida .task-card-title { text-decoration: line-through; color: var(--muted); }
+.task-card.status-done .task-card-title { text-decoration: line-through; color: var(--muted); }
 
 .task-card-desc {
   font-size: 0.8125rem;
