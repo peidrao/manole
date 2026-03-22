@@ -8,11 +8,13 @@ type AuthBody = {
   password: string;
 };
 
-type TaskPayload = {
+type CreateTaskPayload = {
   title: string;
   description: string;
   status: TaskStatus;
 };
+
+type UpdateTaskPayload = Partial<CreateTaskPayload>;
 
 async function request<T>(
   path: string,
@@ -87,12 +89,12 @@ export function getTasks(token: string, status?: TaskStatus, page = 1, perPage =
   return request<TasksResponse>(`/tasks?${params}`, {}, token);
 }
 
-export function createTask(token: string, body: TaskPayload) {
+export function createTask(token: string, body: CreateTaskPayload) {
   return request<Task>('/tasks', { method: 'POST', body: JSON.stringify(body) }, token);
 }
 
-export function updateTask(token: string, taskId: number, body: TaskPayload) {
-  return request<Task>(`/tasks/${taskId}`, { method: 'PUT', body: JSON.stringify(body) }, token);
+export function updateTask(token: string, taskId: number, body: UpdateTaskPayload) {
+  return request<Task>(`/tasks/${taskId}`, { method: 'PATCH', body: JSON.stringify(body) }, token);
 }
 
 export function deleteTask(token: string, taskId: number) {
